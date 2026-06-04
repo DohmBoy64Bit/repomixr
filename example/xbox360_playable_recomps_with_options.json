@@ -1,0 +1,62 @@
+{
+  "output_root": "repomix_xbox360",
+  "output_file_name": "repomix-output.xml",
+  "style": "xml",
+  "timeout_seconds": 1800,
+  "install_timeout_seconds": 600,
+  "repos": [
+    {
+      "game_name": "SonicUnleashedRecompiled",
+      "url": "https://github.com/hedge-dev/UnleashedRecomp"
+    },
+    {
+      "game_name": "reNut",
+      "url": "https://github.com/masterspike52/reNut"
+    },
+    {
+      "game_name": "TiP-Recomp",
+      "url": "https://github.com/SolarCookies/TiP-Recomp"
+    },
+    {
+      "game_name": "KameoRePowered",
+      "url": "https://github.com/birabittoh/KameoRePowered"
+    },
+    {
+      "game_name": "SVR07-Recomp",
+      "url": "https://github.com/HollywoodAkeem/SVR07-Recomp"
+    },
+    {
+      "game_name": "SimpsonsArcade",
+      "url": "https://github.com/sp00nznet/simpsonsarcade"
+    },
+    {
+      "game_name": "Vigilante8Arcade",
+      "url": "https://github.com/sp00nznet/vig8"
+    },
+    {
+      "game_name": "GuitarHeroII",
+      "url": "https://github.com/sp00nznet/gh2"
+    },
+    {
+      "game_name": "CrazyTaxiXBLA",
+      "url": "https://github.com/sp00nznet/ctxbla"
+    },
+    {
+      "game_name": "AceCombat6-Recomp",
+      "url": "https://github.com/sal063/AC6_recomp"
+    },
+    {
+      "game_name": "DaytonaXBLA-Recomp",
+      "url": "https://github.com/Subarasheese/daytona-xbla-recomp"
+    },
+    {
+      "game_name": "MarathonRecomp",
+      "url": "https://github.com/sonicnext-dev/MarathonRecomp"
+    }
+  ],
+  "remove_comments": false,
+  "remove_empty_lines": false,
+  "output_show_line_numbers": false,
+  "parsable_style": false,
+  "compress": false
+}

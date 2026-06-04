@@ -1,4 +1,4 @@
-# Repomix Batch From JSON
+# Repomixr
 
 A small Python utility for batch-generating [Repomix](https://repomix.com/) bundles from a JSON list of GitHub repositories.
 
@@ -26,6 +26,11 @@ Given a JSON file like this:
   "style": "xml",
   "timeout_seconds": 1800,
   "install_timeout_seconds": 600,
+  "remove_comments": false,
+  "remove_empty_lines": false,
+  "output_show_line_numbers": false,
+  "parsable_style": false,
+  "compress": false,
   "repos": [
     {
       "game_name": "SonicUnleashedRecompiled",
@@ -128,6 +133,11 @@ Example:
   "style": "xml",
   "timeout_seconds": 1800,
   "install_timeout_seconds": 600,
+  "remove_comments": false,
+  "remove_empty_lines": false,
+  "output_show_line_numbers": false,
+  "parsable_style": false,
+  "compress": false,
   "repos": [
     {
       "game_name": "SonicUnleashedRecompiled",
@@ -144,7 +154,7 @@ Example:
 ### 2. Run the script
 
 ```bash
-python repomix_batch_from_json.py xbox360_playable_recomps.json
+python repomixr.py xbox360_playable_recomps.json
 ```
 
 ### 3. Check the output folder
@@ -186,6 +196,11 @@ This is the recommended format.
   "style": "xml",
   "timeout_seconds": 1800,
   "install_timeout_seconds": 600,
+  "remove_comments": false,
+  "remove_empty_lines": false,
+  "output_show_line_numbers": false,
+  "parsable_style": false,
+  "compress": false,
   "repos": [
     {
       "game_name": "SonicUnleashedRecompiled",
@@ -208,6 +223,11 @@ This is the recommended format.
 | `style` | No | `xml` | Repomix output style passed to `--style`. |
 | `timeout_seconds` | No | `1800` | Per-repo timeout in seconds. Default is 30 minutes. |
 | `install_timeout_seconds` | No | `600` | Timeout for `npm install -g repomix`. Default is 10 minutes. |
+| `remove_comments` | No | `false` | Passes `--remove-comments` to Repomix. |
+| `remove_empty_lines` | No | `false` | Passes `--remove-empty-lines` to Repomix. |
+| `output_show_line_numbers` | No | `false` | Passes `--output-show-line-numbers` to Repomix. |
+| `parsable_style` | No | `false` | Passes `--parsable-style` to Repomix. |
+| `compress` | No | `false` | Passes `--compress` to Repomix. |
 | `repos` | Yes | none | Array of repo entries. |
 
 #### Repo Object Fields
@@ -316,49 +336,105 @@ This is useful for quick batch runs, but the full config format is better when y
 ### Basic
 
 ```bash
-python repomix_batch_from_json.py repos.json
+python repomixr.py repos.json
 ```
 
 ### Write an example JSON file
 
 ```bash
-python repomix_batch_from_json.py --write-example repos.example.json
+python repomixr.py --write-example repos.example.json
 ```
 
 ### Override the output folder
 
 ```bash
-python repomix_batch_from_json.py repos.json --output-root repomix_n64
+python repomixr.pyrepos.json --output-root repomix_n64
 ```
 
 ### Override the Repomix output filename
 
 ```bash
-python repomix_batch_from_json.py repos.json --output-file n64-repomix.xml
+python repomixr.py repos.json --output-file n64-repomix.xml
 ```
 
 ### Override Repomix style
 
 ```bash
-python repomix_batch_from_json.py repos.json --style xml
+python repomixr.py repos.json --style xml
 ```
 
 ### Override timeout
 
 ```bash
-python repomix_batch_from_json.py repos.json --timeout 3600
+python repomixr.py repos.json --timeout 3600
 ```
 
 ### Override Repomix install timeout
 
 ```bash
-python repomix_batch_from_json.py repos.json --install-timeout 1200
+python repomixr.py repos.json --install-timeout 1200
 ```
+
+### Remove comments
+
+```bash
+python repomixr.py repos.json --remove-comments
+```
+
+### Remove empty lines
+
+```bash
+python repomixr.py repos.json --remove-empty-lines
+```
+
+### Show line numbers in output
+
+```bash
+python repomixr.py repos.json --output-show-line-numbers
+```
+
+### Use parsable style
+
+```bash
+python repomixr.py repos.json --parsable-style
+```
+
+### Compress output
+
+```bash
+python repomixr.py repos.json --compress
+```
+
+### Combine optional Repomix flags
+
+```bash
+python repomixr.py repos.json --remove-comments --remove-empty-lines --compress
+```
+
+You can also enable these from JSON:
+
+```json
+{
+  "output_root": "repomix_clean",
+  "remove_comments": true,
+  "remove_empty_lines": true,
+  "output_show_line_numbers": true,
+  "parsable_style": false,
+  "compress": true,
+  "repos": [
+    {
+      "game_name": "SomeProject",
+      "url": "https://github.com/example/SomeProject"
+    }
+  ]
+}
+```
+
 
 ### Combined example
 
 ```bash
-python repomix_batch_from_json.py n64_recomps.json --output-root repomix_n64 --timeout 3600
+python repomixr.py n64_recomps.json --output-root repomix_n64 --timeout 3600
 ```
 
 ---
@@ -372,6 +448,11 @@ python repomix_batch_from_json.py n64_recomps.json --output-root repomix_n64 --t
   "style": "xml",
   "timeout_seconds": 1800,
   "install_timeout_seconds": 600,
+  "remove_comments": false,
+  "remove_empty_lines": false,
+  "output_show_line_numbers": false,
+  "parsable_style": false,
+  "compress": false,
   "repos": [
     {
       "game_name": "SonicUnleashedRecompiled",
@@ -396,7 +477,7 @@ python repomix_batch_from_json.py n64_recomps.json --output-root repomix_n64 --t
 Run:
 
 ```bash
-python repomix_batch_from_json.py xbox360_playable_recomps.json
+python repomixr.py xbox360_playable_recomps.json
 ```
 
 ---
@@ -410,6 +491,11 @@ python repomix_batch_from_json.py xbox360_playable_recomps.json
   "style": "xml",
   "timeout_seconds": 1800,
   "install_timeout_seconds": 600,
+  "remove_comments": false,
+  "remove_empty_lines": false,
+  "output_show_line_numbers": false,
+  "parsable_style": false,
+  "compress": false,
   "repos": [
     {
       "game_name": "Zelda64Recomp",
@@ -426,7 +512,7 @@ python repomix_batch_from_json.py xbox360_playable_recomps.json
 Run:
 
 ```bash
-python repomix_batch_from_json.py n64_recomps.json
+python repomixr.py n64_recomps.json
 ```
 
 ---
@@ -452,7 +538,7 @@ python repomix_batch_from_json.py n64_recomps.json
 Run:
 
 ```bash
-python repomix_batch_from_json.py tools.json
+python repomixr.py tools.json
 ```
 
 ---
@@ -469,6 +555,16 @@ For each repo entry, the script:
 
 ```bash
 repomix --remote <repo-url> --style <style> -o <output-file-name>
+```
+
+When enabled, the script appends any of these optional flags:
+
+```bash
+--remove-comments
+--remove-empty-lines
+--output-show-line-numbers
+--parsable-style
+--compress
 ```
 
 6. Saves Repomix stdout to:
@@ -628,13 +724,13 @@ You ran the script without a JSON file.
 Use:
 
 ```bash
-python repomix_batch_from_json.py repos.json
+python repomixr.py repos.json
 ```
 
 Or create an example:
 
 ```bash
-python repomix_batch_from_json.py --write-example repos.example.json
+python repomixr.py --write-example repos.example.json
 ```
 
 ---
@@ -711,7 +807,7 @@ C:\Users\<YourUser>\AppData\Roaming\npm
 Increase the timeout:
 
 ```bash
-python repomix_batch_from_json.py repos.json --timeout 3600
+python repomixr.py repos.json --timeout 3600
 ```
 
 Or in JSON:
@@ -779,7 +875,7 @@ with:
 Run:
 
 ```bash
-python repomix_batch_from_json.py xbox360_playable_recomps.json
+python repomixr.py xbox360_playable_recomps.json
 ```
 
 ---
@@ -801,7 +897,7 @@ with:
 Run:
 
 ```bash
-python repomix_batch_from_json.py n64_recomps.json
+python repomixr.py n64_recomps.json
 ```
 
 ---
@@ -836,7 +932,7 @@ or URL-only entries:
 Run:
 
 ```bash
-python repomix_batch_from_json.py repos.json
+python repomixr.py repos.json
 ```
 
 ---
@@ -875,9 +971,9 @@ my-repomix-batches/
 You can use CLI overrides to keep outputs organized:
 
 ```bash
-python repomix_batch_from_json.py lists/xbox360_playable_recomps.json --output-root output/repomix_xbox360
-python repomix_batch_from_json.py lists/n64_recomps.json --output-root output/repomix_n64
-python repomix_batch_from_json.py lists/tools.json --output-root output/repomix_tools
+python repomixr.py lists/xbox360_playable_recomps.json --output-root output/repomix_xbox360
+python repomixr.py lists/n64_recomps.json --output-root output/repomix_n64
+python repomixr.py lists/tools.json --output-root output/repomix_tools
 ```
 
 ---
@@ -906,7 +1002,7 @@ Each generated project folder includes a `README.md` with the original GitHub re
 Run:
 
 ```bash
-python repomix_batch_from_json.py repos.json
+python repomixr.py repos.json
 ```
 
 Output:

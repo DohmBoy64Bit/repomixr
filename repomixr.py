@@ -13,14 +13,17 @@ repomix/
 
 Usage:
 
-  python app.py repos.json
+  python repomixr.py repos.json
 
 Optional:
 
-  python app.py repos.json --output-root repomix_n64
-  python app.py repos.json --output-file repo.xml
-  python app.py repos.json --style xml
-  python app.py --write-example repos.example.json
+  python repomixr.py repos.json --output-root repomix_n64
+  python repomixr.py repos.json --output-file repo.xml
+  python repomixr.py repos.json --style xml
+  python repomixr.py repos.json --remove-comments --remove-empty-lines
+  python repomixr.py repos.json --output-show-line-numbers --parsable-style
+  python repomixr.py repos.json --compress
+  python repomixr.py --write-example repos.example.json
 
 JSON formats supported:
 
@@ -52,6 +55,11 @@ JSON formats supported:
   "style": "xml",
   "timeout_seconds": 1800,
   "install_timeout_seconds": 600,
+  "remove_comments": false,
+  "remove_empty_lines": false,
+  "output_show_line_numbers": false,
+  "parsable_style": false,
+  "compress": false,
   "repos": [
     {
       "game_name": "SonicUnleashedRecompiled",
@@ -110,6 +118,11 @@ class BatchConfig:
     style: str = "xml"
     timeout_seconds: int = 60 * 30
     install_timeout_seconds: int = 60 * 10
+    remove_comments: bool = False
+    remove_empty_lines: bool = False
+    output_show_line_numbers: bool = False
+    parsable_style: bool = False
+    compress: bool = False
 
 
 SUBPROCESS_TEXT_KWARGS: dict[str, Any] = {
@@ -125,6 +138,11 @@ EXAMPLE_JSON: dict[str, Any] = {
     "style": "xml",
     "timeout_seconds": 1800,
     "install_timeout_seconds": 600,
+    "remove_comments": False,
+    "remove_empty_lines": False,
+    "output_show_line_numbers": False,
+    "parsable_style": False,
+    "compress": False,
     "repos": [
         {
             "game_name": "SonicUnleashedRecompiled",
@@ -244,6 +262,35 @@ def repo_job_from_item(item: Any, index: int) -> RepoJob:
     return RepoJob(game_name=game_name.strip(), url=url)
 
 
+def parse_bool(value: Any, default: bool = False) -> bool:
+    """
+    Parse JSON boolean-ish values safely.
+
+    Accepted true values:
+      true, "true", "yes", "y", "1", 1, "on"
+
+    Accepted false values:
+      false, "false", "no", "n", "0", 0, "off", null
+    """
+    if value is None:
+        return default
+
+    if isinstance(value, bool):
+        return value
+
+    if isinstance(value, int):
+        return value != 0
+
+    if isinstance(value, str):
+        lowered = value.strip().lower()
+        if lowered in {"true", "yes", "y", "1", "on"}:
+            return True
+        if lowered in {"false", "no", "n", "0", "off", ""}:
+            return False
+
+    raise RuntimeError(f"Invalid boolean value: {value!r}")
+
+
 def load_batch_config(json_path: Path) -> BatchConfig:
     """
     Load repos and optional settings from a JSON file.
@@ -264,6 +311,11 @@ def load_batch_config(json_path: Path) -> BatchConfig:
         style = "xml"
         timeout_seconds = 60 * 30
         install_timeout_seconds = 60 * 10
+        remove_comments = False
+        remove_empty_lines = False
+        output_show_line_numbers = False
+        parsable_style = False
+        compress = False
 
     elif isinstance(raw, dict):
         repo_items = raw.get("repos")
@@ -283,6 +335,12 @@ def load_batch_config(json_path: Path) -> BatchConfig:
             raise RuntimeError(
                 "timeout_seconds and install_timeout_seconds must be integers."
             ) from None
+
+        remove_comments = parse_bool(raw.get("remove_comments"), False)
+        remove_empty_lines = parse_bool(raw.get("remove_empty_lines"), False)
+        output_show_line_numbers = parse_bool(raw.get("output_show_line_numbers"), False)
+        parsable_style = parse_bool(raw.get("parsable_style"), False)
+        compress = parse_bool(raw.get("compress"), False)
 
     else:
         raise RuntimeError(
@@ -324,6 +382,11 @@ def load_batch_config(json_path: Path) -> BatchConfig:
         style=style,
         timeout_seconds=timeout_seconds,
         install_timeout_seconds=install_timeout_seconds,
+        remove_comments=remove_comments,
+        remove_empty_lines=remove_empty_lines,
+        output_show_line_numbers=output_show_line_numbers,
+        parsable_style=parsable_style,
+        compress=compress,
     )
 
 
@@ -345,6 +408,21 @@ def apply_cli_overrides(config: BatchConfig, args: argparse.Namespace) -> BatchC
 
     if args.install_timeout is not None:
         config.install_timeout_seconds = args.install_timeout
+
+    if args.remove_comments:
+        config.remove_comments = True
+
+    if args.remove_empty_lines:
+        config.remove_empty_lines = True
+
+    if args.output_show_line_numbers:
+        config.output_show_line_numbers = True
+
+    if args.parsable_style:
+        config.parsable_style = True
+
+    if args.compress:
+        config.compress = True
 
     return config
 
@@ -553,6 +631,21 @@ def run_repomix(job: RepoJob, config: BatchConfig, repomix_cmd: Sequence[str]) -
         config.output_file_name,
     ]
 
+    if config.remove_comments:
+        command.append("--remove-comments")
+
+    if config.remove_empty_lines:
+        command.append("--remove-empty-lines")
+
+    if config.output_show_line_numbers:
+        command.append("--output-show-line-numbers")
+
+    if config.parsable_style:
+        command.append("--parsable-style")
+
+    if config.compress:
+        command.append("--compress")
+
     print(f"\n=== Processing: {job.game_name} ===")
     print(f"Repo: {job.url}")
     print(f"Folder: {folder}")
@@ -676,6 +769,36 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
         help="Override npm install timeout in seconds.",
     )
 
+    parser.add_argument(
+        "--remove-comments",
+        action="store_true",
+        help="Pass --remove-comments to Repomix.",
+    )
+
+    parser.add_argument(
+        "--remove-empty-lines",
+        action="store_true",
+        help="Pass --remove-empty-lines to Repomix.",
+    )
+
+    parser.add_argument(
+        "--output-show-line-numbers",
+        action="store_true",
+        help="Pass --output-show-line-numbers to Repomix.",
+    )
+
+    parser.add_argument(
+        "--parsable-style",
+        action="store_true",
+        help="Pass --parsable-style to Repomix.",
+    )
+
+    parser.add_argument(
+        "--compress",
+        action="store_true",
+        help="Pass --compress to Repomix.",
+    )
+
     return parser.parse_args(argv)
 
 
@@ -719,6 +842,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         f"Output root: `{config.output_root}`",
         f"Output file name: `{config.output_file_name}`",
         f"Repomix style: `{config.style}`",
+        f"Remove comments: `{config.remove_comments}`",
+        f"Remove empty lines: `{config.remove_empty_lines}`",
+        f"Show line numbers: `{config.output_show_line_numbers}`",
+        f"Parsable style: `{config.parsable_style}`",
+        f"Compress: `{config.compress}`",
         "",
         "| Status | Project | Repo |",
         "|---|---|---|",
