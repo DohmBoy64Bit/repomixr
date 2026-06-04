@@ -1,0 +1,10 @@
+@"
+.venv/
+__pycache__/
+*.pyc
+repomix/
+repomix_*/
+*.log
+.DS_Store
+.idea/
+"@ | Out-File -Encoding utf8 .gitignore
